@@ -7,8 +7,8 @@ import { AuthResponse } from '../../shared/models/models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly TOKEN_KEY = 'jobpipe_token';
-  private readonly USER_KEY = 'jobpipe_user';
+  private readonly TOKEN_KEY = 'applytracker_token';
+  private readonly USER_KEY = 'applytracker_user';
 
   isLoggedIn = signal<boolean>(this.hasToken());
 

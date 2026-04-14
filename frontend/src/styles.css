@@ -1,4 +1,10 @@
-/* Global Styles for Jobpipe */
+/* Global Styles for ApplyTracker */
+
+/* Tailwind CSS base layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "jobpipe-frontend": {
+    "applytracker-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -18,7 +18,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/jobpipe-frontend",
+            "outputPath": "dist/applytracker-frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "jobpipe-frontend:build:production"
+              "buildTarget": "applytracker-frontend:build:production"
             },
             "development": {
-              "buildTarget": "jobpipe-frontend:build:development"
+              "buildTarget": "applytracker-frontend:build:development"
             }
           },
           "defaultConfiguration": "development",

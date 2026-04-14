@@ -12,7 +12,7 @@ import { AuthService } from './core/services/auth.service';
       @if (auth.isLoggedIn()) {
         <nav class="sidebar">
           <div class="sidebar-logo">
-            <span class="logo-text">Jobpipe</span>
+            <span class="logo-text">ApplyTracker</span>
           </div>
           <ul class="nav-list">
             <li>

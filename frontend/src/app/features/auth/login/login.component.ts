@@ -12,7 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
     <div class="auth-page">
       <div class="auth-card card">
         <h1 class="auth-title">Welcome back</h1>
-        <p class="auth-subtitle">Sign in to Jobpipe</p>
+        <p class="auth-subtitle">Sign in to ApplyTracker</p>
 
         @if (error) {
           <div class="alert alert-error">{{ error }}</div>

@@ -1,4 +1,4 @@
-# Jobpipe
+# ApplyTracker
 
 A clean fullstack job application tracking app built with **Angular** (frontend) and **NestJS** (backend), backed by **PostgreSQL**.
 
@@ -9,6 +9,7 @@ A clean fullstack job application tracking app built with **Angular** (frontend)
 | Layer     | Technology           |
 |-----------|----------------------|
 | Frontend  | Angular 19 (standalone components) |
+| Styling   | Tailwind CSS v3      |
 | Backend   | NestJS 10 (TypeScript) |
 | Database  | PostgreSQL           |
 | ORM       | TypeORM              |
@@ -61,7 +62,7 @@ A clean fullstack job application tracking app built with **Angular** (frontend)
 
 ```bash
 git clone <repo-url>
-cd jobpipe
+cd ApplyTracker
 ```
 
 Create the backend `.env` file:
@@ -75,7 +76,7 @@ Edit `backend/.env` and update the database credentials and JWT secret.
 ### 2. Create the database
 
 ```sql
-CREATE DATABASE jobpipe;
+CREATE DATABASE applytracker;
 ```
 
 ### 3. Install dependencies
@@ -146,4 +147,4 @@ The Angular dev server proxies `/api` requests to `http://localhost:3000` automa
 
 ## Development
 
-See [AGENTS.md](./AGENTS.md) for development rules, conventions, and commands.
+See [AGENTS.md](./AGENTS.md) for development rules, conventions, commands, and Git Flow workflow.

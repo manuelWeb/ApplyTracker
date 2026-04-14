@@ -21,7 +21,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
         port: config.get<number>('DB_PORT', 5432),
         username: config.get('DB_USERNAME', 'postgres'),
         password: config.get('DB_PASSWORD', 'postgres'),
-        database: config.get('DB_NAME', 'jobpipe'),
+        database: config.get('DB_NAME', 'applytracker'),
         autoLoadEntities: true,
         synchronize: config.get('NODE_ENV') !== 'production',
       }),

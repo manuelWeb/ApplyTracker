@@ -1,4 +1,4 @@
-# Jobpipe — AGENTS.md
+# ApplyTracker — AGENTS.md
 
 Development rules, conventions, and commands for contributors and AI agents.
 
@@ -7,7 +7,7 @@ Development rules, conventions, and commands for contributors and AI agents.
 ## Project Structure
 
 ```
-jobpipe/
+ApplyTracker/
 ├── backend/          # NestJS API
 │   └── src/
 │       ├── auth/         # JWT authentication
@@ -74,7 +74,8 @@ npm test               # Run Karma tests
 - Lazy-load all feature components via `loadComponent` in routes
 - HTTP calls go through services only — never directly in components
 - The `AuthInterceptor` automatically attaches the Bearer token
-- Use the global CSS classes from `styles.css` (`.btn`, `.card`, `.form-control`, etc.)
+- Use **Tailwind CSS** utility classes for styling; avoid writing custom CSS unless necessary
+- Keep component-level `styles` minimal — prefer Tailwind utilities in templates
 
 ### Database
 
@@ -85,11 +86,85 @@ npm test               # Run Karma tests
 
 ---
 
+## Git Flow
+
+This project follows the [git-flow](https://nvie.com/posts/a-successful-git-branching-model/) branching model.
+
+### Install git-flow
+
+**macOS (Homebrew)**
+```bash
+brew install git-flow-avh
+```
+
+**Linux (Debian/Ubuntu)**
+```bash
+sudo apt-get install git-flow
+```
+
+**Windows (Git for Windows)**
+
+git-flow is bundled with [Git for Windows](https://gitforwindows.org/). No extra installation needed.
+
+### Initialize in your repo
+
+Run once after cloning:
+
+```bash
+git flow init
+```
+
+Accept the defaults (or customise branch names). This sets up:
+- `main` — production-ready code
+- `develop` — integration branch for features
+
+### Everyday workflow
+
+**Start a feature**
+```bash
+git flow feature start <name>
+# e.g. git flow feature start add-company-logo
+```
+
+**Finish a feature** (merges into `develop`, deletes the feature branch)
+```bash
+git flow feature finish <name>
+```
+
+**Start a release**
+```bash
+git flow release start <version>
+# e.g. git flow release start 1.1.0
+```
+
+**Finish a release** (merges into `main` and `develop`, creates a tag)
+```bash
+git flow release finish <version>
+```
+
+**Start a hotfix** (branches off `main`)
+```bash
+git flow hotfix start <name>
+git flow hotfix finish <name>
+```
+
+### Branch naming convention
+
+| Prefix      | Purpose                            |
+|-------------|------------------------------------|
+| `feature/*` | New features or enhancements       |
+| `release/*` | Release preparation                |
+| `hotfix/*`  | Urgent production fixes            |
+| `bugfix/*`  | Non-urgent bug fixes on `develop`  |
+
+---
+
 ## Environment Setup
 
 1. Copy `.env.example` to `backend/.env`
-2. Create a PostgreSQL database named `jobpipe`
+2. Create a PostgreSQL database named `applytracker`
 3. Install dependencies in both `backend/` and `frontend/`
 4. Start the backend first, then the frontend
 
 See `README.md` for full setup instructions.
+
