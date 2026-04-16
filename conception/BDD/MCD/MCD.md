@@ -1,0 +1,36 @@
+# MCD
+
+```mocodo
+QUALIFIE_EMAIL_TEMPLATE, 0N EMAIL_TEMPLATE, 0N TAG
+TAG: num_tag, nom
+QUALIFIE_CANDIDATURE, 0N CANDIDATURE, 0N TAG
+COMMENTAIRE: num_commentaire, contenu, date_commentaire
+POSSEDE_COMMENTAIRE, 0N EVENEMENT, 11 COMMENTAIRE
+CONTACT: num_contact, nom, prenom, email, telephone, role, notes
+
+EMAIL_TEMPLATE: num_email_template, nom, sujet, corps
+QUALIFIE_DOCUMENT, 0N DOCUMENT, 0N TAG
+DOCUMENT: num_document, nom, type_document, file_path
+POSSEDE_EVENEMENT, 0N CANDIDATURE, 11 EVENEMENT
+EVENEMENT: num_evenement, type_evenement, date_evenement
+POSSEDE_CONTACT, 0N ENTREPRISE, 11 CONTACT
+
+POSSEDE_EMAIL_TEMPLATE, 0N UTILISATEUR, 11 EMAIL_TEMPLATE
+POSSEDE_DOCUMENT, 0N UTILISATEUR, 11 DOCUMENT
+UTILISE_DOCUMENT, 0N CANDIDATURE, 0N DOCUMENT
+CANDIDATURE: num_candidature, poste, domaine_du_poste, but_du_projet, description_offre, score,url_offre, localisation
+LIE_ENTREPRISE, 11 CANDIDATURE, 0N ENTREPRISE
+ENTREPRISE: num_entreprise, nom, site_web
+
+UTILISATEUR: num_utilisateur, email, password
+POSSEDE_CANDIDATURE, 0N UTILISATEUR,11 CANDIDATURE
+CONTRAT: num_contrat, nom
+UTILISE_CONTRAT, 11 CANDIDATURE, 0N CONTRAT
+A_POUR_STATUT, 11 CANDIDATURE, 0N STATUT
+STATUT: num_statut, ordre, nom
+
+```
+
+## Liens mocodo
+
+- diagramme [MCD.mcd](https://www.mocodo.net/?mcd=eNptU8lu2zAQvfMr-AE6NNfeBJstBNiyo6VXgZHGCQuJJLgkyN-XixZK9UEQZ94sj2-Gr21-KX4VpCPXvLh0DbneL3lDMvyjxE9cTf4bue8n5nbqDH3PMBcTel2KnPLyXJzzpq1i-NH26afb9UrKJi8qEsv0YpqAG8oUZLgX3AC3GR6ogRRC91tdk7PrseVHln9ISbwnwy8vOEFdJ3c4NUsXV6c3gXCGpYLwh4myMcMGRpAfgjsCSozggwxohPYKxEIhpTMwydFRnOtp-xeMZ6-k3uQ4305tZOZ47gwvxOKIZQfRW3_XuaD5lpD4HmyETlLzscqQXPsotJNhRdF6mtl_AodYM7RI7KD4aid6BxWj1mVTkXtV1GQWO0BoI_X_xrRNcSlqZ7VVZLYLWTN36hxzFhBF4BB9XLI1OgHmHaB8YO6a1m-aFNqPbxBuntxpbbvZ82ZNsJQIMx1A94pJwwTvxOPhU7WbM2RWjYtjFD0dmaY-CF38azoIdaC4wWg7zgPiRoFUTK-rxdxYvuANoUSWGGsNC13BqnWVJdX6S6hhm9-hdyrunlp4MFWePBhF4z6uws8RTy81Yyjv7re26urGQc8jI4TiL3bTxo3FNXPMVbz5P5m1aiw=)
