@@ -1,16 +1,34 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: applytracker-postgres
-    restart: unless-stopped
+  db:
+    image: postgres:17-alpine
+    container_name: applytracker_db
+    restart: always
+    ports:
+      - "${POSTGRES_HOST_PORT}:${POSTGRES_CONTAINER_PORT}"
     environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: applytracker_api
+    # Here we use the same .env file for both the db and api services more maintainable
+    env_file:
+      - .env
+      - ./backend/.env
+    ports:
+      # - "${PORT}:3000"
+      - 3008:3000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - db
 
 volumes:
   postgres_data:
