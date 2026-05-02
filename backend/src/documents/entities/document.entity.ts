@@ -1,3 +1,5 @@
+import { Application } from 'src/applications/entities/application.entity';
+import { Tag } from 'src/tags/entities/tag.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
@@ -5,6 +7,8 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity('documents')
@@ -37,4 +41,21 @@ export class Document {
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'user_id' })
   user!: User;
+
+  @ManyToMany(() => Application, (application) => application.documents)
+  applications!: Application[];
+
+  @ManyToMany(() => Tag, (tag) => tag.documents)
+  @JoinTable({
+    name: 'document_tag',
+    joinColumn: {
+      name: 'document_id',
+      referencedColumnName: 'documentId',
+    },
+    inverseJoinColumn: {
+      name: 'tag_id',
+      referencedColumnName: 'tagId',
+    },
+  })
+  tags!: Tag[];
 }

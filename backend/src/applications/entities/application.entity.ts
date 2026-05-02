@@ -4,11 +4,15 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Company } from 'src/companies/entities/company.entity';
 import { Contract } from 'src/contracts/entities/contract.entity';
 import { Status } from 'src/statuses/entities/status.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Tag } from 'src/tags/entities/tag.entity';
+import { Document } from 'src/documents/entities/document.entity';
 
 @Entity('applications')
 export class Application {
@@ -83,4 +87,32 @@ export class Application {
   @ManyToOne(() => Status, { nullable: false })
   @JoinColumn({ name: 'status_id' })
   status!: Status;
+
+  @ManyToMany(() => Tag, (tag) => tag.applications)
+  @JoinTable({
+    name: 'application_tag',
+    joinColumn: {
+      name: 'application_id',
+      referencedColumnName: 'applicationId',
+    },
+    inverseJoinColumn: {
+      name: 'tag_id',
+      referencedColumnName: 'tagId',
+    },
+  })
+  tags!: Tag[];
+
+  @ManyToMany(() => Document, (document) => document.applications)
+  @JoinTable({
+    name: 'application_document',
+    joinColumn: {
+      name: 'application_id',
+      referencedColumnName: 'applicationId',
+    },
+    inverseJoinColumn: {
+      name: 'document_id',
+      referencedColumnName: 'documentId',
+    },
+  })
+  documents!: Document[];
 }
