@@ -10,6 +10,7 @@ import { AppService } from './app.service';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    //  config ORM for NestJS runtime
     TypeOrmModule.forRoot(typeOrmConfig),
   ],
   controllers: [AppController],

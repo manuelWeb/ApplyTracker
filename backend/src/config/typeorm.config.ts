@@ -1,5 +1,5 @@
+// Configuration used by AppModule / Nest
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-
 export const typeOrmConfig: TypeOrmModuleOptions = {
   type: 'postgres',
 
