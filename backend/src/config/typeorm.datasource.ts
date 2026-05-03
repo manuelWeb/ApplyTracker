@@ -6,7 +6,7 @@ dotenv.config({
   path: '../.env',
 });
 
-export default new DataSource({
+export const typeOrmDataSource = new DataSource({
   type: 'postgres',
 
   host: 'localhost',
@@ -21,3 +21,5 @@ export default new DataSource({
 
   synchronize: false,
 });
+
+export default typeOrmDataSource;
