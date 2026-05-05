@@ -22,24 +22,29 @@ async function bootstrap(): Promise<void> {
   await typeOrmDataSource.initialize();
   console.log('Database connection established!');
 
-  const repositories = createRepositories();
+  try {
+    const repositories = createRepositories();
 
-  await runSeeders([
-    new StatusSeeder(repositories.statusRepository),
-    new UserSeeder(repositories.userRepository),
-    new CompanySeeder(repositories.companyRepository),
-    new ContractSeeder(repositories.contractRepository),
-    new ApplicationSeeder(
-      repositories.applicationRepository,
-      repositories.userRepository,
-      repositories.companyRepository,
-      repositories.contractRepository,
-      repositories.statusRepository,
-    ),
-  ]);
-
-  await typeOrmDataSource.destroy();
-  console.log('DB Connection closed.');
+    // Keep dependency-based order: referenced entities first, applications last.
+    await runSeeders([
+      new StatusSeeder(repositories.statusRepository),
+      new UserSeeder(repositories.userRepository),
+      new CompanySeeder(repositories.companyRepository),
+      new ContractSeeder(repositories.contractRepository),
+      new ApplicationSeeder(
+        repositories.applicationRepository,
+        repositories.userRepository,
+        repositories.companyRepository,
+        repositories.contractRepository,
+        repositories.statusRepository,
+      ),
+    ]);
+  } finally {
+    if (typeOrmDataSource.isInitialized) {
+      await typeOrmDataSource.destroy();
+      console.log('DB Connection closed.');
+    }
+  }
 }
 
 function createRepositories() {
@@ -57,12 +62,7 @@ bootstrap()
     console.log('Seed completed!');
     process.exit(0);
   })
-  .catch(async (error) => {
+  .catch((error) => {
     console.error('Seed failed!', error);
-
-    if (typeOrmDataSource.isInitialized) {
-      await typeOrmDataSource.destroy();
-      console.log('Database closed after error.');
-    }
     process.exit(1);
   });
