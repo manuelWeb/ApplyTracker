@@ -22,27 +22,34 @@ async function bootstrap(): Promise<void> {
   await typeOrmDataSource.initialize();
   console.log('Database connection established!');
 
-  const statusRepository = typeOrmDataSource.getRepository(Status);
-  const userRepository = typeOrmDataSource.getRepository(User);
-  const companyRepository = typeOrmDataSource.getRepository(Company);
-  const contractRepository = typeOrmDataSource.getRepository(Contract);
-  const applicationRepository = typeOrmDataSource.getRepository(Application);
+  const repositories = createRepositories();
+
   await runSeeders([
-    new StatusSeeder(statusRepository),
-    new UserSeeder(userRepository),
-    new CompanySeeder(companyRepository),
-    new ContractSeeder(contractRepository),
+    new StatusSeeder(repositories.statusRepository),
+    new UserSeeder(repositories.userRepository),
+    new CompanySeeder(repositories.companyRepository),
+    new ContractSeeder(repositories.contractRepository),
     new ApplicationSeeder(
-      applicationRepository,
-      userRepository,
-      companyRepository,
-      contractRepository,
-      statusRepository,
+      repositories.applicationRepository,
+      repositories.userRepository,
+      repositories.companyRepository,
+      repositories.contractRepository,
+      repositories.statusRepository,
     ),
   ]);
 
   await typeOrmDataSource.destroy();
   console.log('DB Connection closed.');
+}
+
+function createRepositories() {
+  return {
+    statusRepository: typeOrmDataSource.getRepository(Status),
+    userRepository: typeOrmDataSource.getRepository(User),
+    companyRepository: typeOrmDataSource.getRepository(Company),
+    contractRepository: typeOrmDataSource.getRepository(Contract),
+    applicationRepository: typeOrmDataSource.getRepository(Application),
+  };
 }
 
 bootstrap()
