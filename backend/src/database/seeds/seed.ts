@@ -1,13 +1,18 @@
 import { typeOrmDataSource } from 'src/config/typeorm.datasource';
 import { runSeeders } from 'src/database/seeds/seeders';
 
+import { Status } from '@/statuses/entities/status.entity';
+import { StatusSeeder } from '@/database/seeds/seeders/status.seeder';
+
 async function bootstrap(): Promise<void> {
   console.log('Starting database seed…');
 
   await typeOrmDataSource.initialize();
   console.log('Database connection established!');
 
-  await runSeeders([]);
+  const statusRepository = typeOrmDataSource.getRepository(Status);
+
+  await runSeeders([new StatusSeeder(statusRepository)]);
 
   await typeOrmDataSource.destroy();
   console.log('DB Connection closed.');
