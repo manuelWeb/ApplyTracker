@@ -13,6 +13,9 @@ import { CompanySeeder } from '@/database/seeds/seeders/company.seeder';
 import { Contract } from '@/contracts/entities/contract.entity';
 import { ContractSeeder } from '@/database/seeds/seeders/contract.seeder';
 
+import { Application } from '@/applications/entities/application.entity';
+import { ApplicationSeeder } from '@/database/seeds/seeders/application.seeder';
+
 async function bootstrap(): Promise<void> {
   console.log('Starting database seed…');
 
@@ -23,11 +26,19 @@ async function bootstrap(): Promise<void> {
   const userRepository = typeOrmDataSource.getRepository(User);
   const companyRepository = typeOrmDataSource.getRepository(Company);
   const contractRepository = typeOrmDataSource.getRepository(Contract);
+  const applicationRepository = typeOrmDataSource.getRepository(Application);
   await runSeeders([
     new StatusSeeder(statusRepository),
     new UserSeeder(userRepository),
     new CompanySeeder(companyRepository),
     new ContractSeeder(contractRepository),
+    new ApplicationSeeder(
+      applicationRepository,
+      userRepository,
+      companyRepository,
+      contractRepository,
+      statusRepository,
+    ),
   ]);
 
   await typeOrmDataSource.destroy();
