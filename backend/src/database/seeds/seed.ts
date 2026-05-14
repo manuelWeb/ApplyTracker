@@ -1,4 +1,4 @@
-import { typeOrmDataSource } from 'src/config/typeorm.datasource';
+import typeOrmDataSource from 'src/config/typeorm.datasource';
 import { runSeeders } from 'src/database/seeds/seeders';
 
 import { Status } from '@/statuses/entities/status.entity';
