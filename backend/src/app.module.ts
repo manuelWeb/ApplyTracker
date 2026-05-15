@@ -13,6 +13,7 @@ import { ContactsModule } from './contacts/contacts.module';
 import { EventsModule } from './events/events.module';
 import { CommentsModule } from './comments/comments.module';
 import { EmailTemplatesModule } from './email-templates/email-templates.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { EmailTemplatesModule } from './email-templates/email-templates.module';
     EventsModule,
     CommentsModule,
     EmailTemplatesModule,
+    DocumentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
