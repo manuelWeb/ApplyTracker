@@ -11,6 +11,7 @@ import { TagsModule } from './tags/tags.module';
 import { CompaniesModule } from './companies/companies.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { EventsModule } from './events/events.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { EventsModule } from './events/events.module';
     CompaniesModule,
     ContactsModule,
     EventsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
