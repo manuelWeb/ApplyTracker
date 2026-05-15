@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { ApplicationsModule } from './applications/applications.module';
 import { ContractsModule } from './contracts/contracts.module';
 import { StatusesModule } from './statuses/statuses.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { StatusesModule } from './statuses/statuses.module';
     ApplicationsModule,
     ContractsModule,
     StatusesModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
