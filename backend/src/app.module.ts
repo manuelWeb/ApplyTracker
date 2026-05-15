@@ -10,6 +10,7 @@ import { StatusesModule } from './statuses/statuses.module';
 import { TagsModule } from './tags/tags.module';
 import { CompaniesModule } from './companies/companies.module';
 import { ContactsModule } from './contacts/contacts.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ContactsModule } from './contacts/contacts.module';
     TagsModule,
     CompaniesModule,
     ContactsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
