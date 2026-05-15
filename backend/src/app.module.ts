@@ -12,6 +12,7 @@ import { CompaniesModule } from './companies/companies.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { EventsModule } from './events/events.module';
 import { CommentsModule } from './comments/comments.module';
+import { EmailTemplatesModule } from './email-templates/email-templates.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CommentsModule } from './comments/comments.module';
     ContactsModule,
     EventsModule,
     CommentsModule,
+    EmailTemplatesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
