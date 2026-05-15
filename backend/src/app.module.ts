@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { typeOrmConfig } from './config/typeorm.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ApplicationsModule } from './applications/applications.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AppService } from './app.service';
     }),
     //  config ORM for NestJS runtime
     TypeOrmModule.forRoot(typeOrmConfig),
+    ApplicationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
