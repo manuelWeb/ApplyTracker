@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ApplicationsModule } from './applications/applications.module';
 import { ContractsModule } from './contracts/contracts.module';
+import { StatusesModule } from './statuses/statuses.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ContractsModule } from './contracts/contracts.module';
     TypeOrmModule.forRoot(typeOrmConfig),
     ApplicationsModule,
     ContractsModule,
+    StatusesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
