@@ -8,6 +8,7 @@ import { ApplicationsModule } from './applications/applications.module';
 import { ContractsModule } from './contracts/contracts.module';
 import { StatusesModule } from './statuses/statuses.module';
 import { TagsModule } from './tags/tags.module';
+import { CompaniesModule } from './companies/companies.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TagsModule } from './tags/tags.module';
     ContractsModule,
     StatusesModule,
     TagsModule,
+    CompaniesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
