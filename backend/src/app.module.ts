@@ -14,6 +14,7 @@ import { EventsModule } from './events/events.module';
 import { CommentsModule } from './comments/comments.module';
 import { EmailTemplatesModule } from './email-templates/email-templates.module';
 import { DocumentsModule } from './documents/documents.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { DocumentsModule } from './documents/documents.module';
     CommentsModule,
     EmailTemplatesModule,
     DocumentsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
