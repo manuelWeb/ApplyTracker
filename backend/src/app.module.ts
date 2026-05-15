@@ -9,6 +9,7 @@ import { ContractsModule } from './contracts/contracts.module';
 import { StatusesModule } from './statuses/statuses.module';
 import { TagsModule } from './tags/tags.module';
 import { CompaniesModule } from './companies/companies.module';
+import { ContactsModule } from './contacts/contacts.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CompaniesModule } from './companies/companies.module';
     StatusesModule,
     TagsModule,
     CompaniesModule,
+    ContactsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
