@@ -25,4 +25,13 @@ export class UsersService {
       },
     });
   }
+
+  create(email: string, passwordHash: string) {
+    const user = this.usersRepository.create({
+      email,
+      passwordHash,
+    });
+
+    return this.usersRepository.save(user);
+  }
 }
