@@ -8,11 +8,15 @@ import {
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { EntityNotFoundError } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { QueryFailedError } from 'typeorm';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async register(dto: RegisterDto) {
     const email = dto.email.trim().toLowerCase();
@@ -49,9 +53,19 @@ export class AuthService {
         throw new UnauthorizedException('Invalid credentials');
       }
 
-      return {
-        userId: currentUser.userId,
+      const payload = {
+        sub: currentUser.userId,
         email: currentUser.email,
+      };
+
+      const accessToken = await this.jwtService.signAsync(payload);
+
+      return {
+        user: {
+          userId: currentUser.userId,
+          email: currentUser.email,
+        },
+        accessToken,
       };
     } catch (error) {
       if (error instanceof EntityNotFoundError) {

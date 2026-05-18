@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UsersService } from '@/users/users.service';
 import bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -9,6 +10,10 @@ describe('AuthService', () => {
   const usersService = {
     create: jest.fn(),
     findByEmail: jest.fn(),
+  };
+
+  const jwtService = {
+    signAsync: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -20,6 +25,10 @@ describe('AuthService', () => {
         {
           provide: UsersService,
           useValue: usersService,
+        },
+        {
+          provide: JwtService,
+          useValue: jwtService,
         },
       ],
     }).compile();
@@ -73,13 +82,13 @@ describe('AuthService', () => {
         email,
         passwordHash: hashedPassword,
       };
-      const safeUser = {
-        userId,
-        email,
-      };
-      // MOCK
+
+      // MOCK repos service (findByEmail)
       usersService.findByEmail.mockResolvedValue(currentUserPayload);
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
+      // MOCK JwtService
+      const accessToken = 'mock-access-token-sha1';
+      jwtService.signAsync.mockResolvedValue(accessToken);
       // CALL
       const resp = await service.login(dto);
       // CHECK
@@ -89,7 +98,15 @@ describe('AuthService', () => {
         dto.password,
         currentUserPayload.passwordHash,
       );
-      expect(resp).toEqual(safeUser);
+      expect(resp).toEqual({
+        user: {
+          userId,
+          email,
+        },
+        accessToken,
+      });
+
+      expect(jwtService.signAsync).toHaveBeenCalledWith({ sub: userId, email });
     });
   });
 });
