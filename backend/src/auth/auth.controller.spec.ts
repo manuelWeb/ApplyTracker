@@ -7,6 +7,7 @@ describe('AuthController', () => {
 
   const authService = {
     register: jest.fn(),
+    login: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -43,6 +44,27 @@ describe('AuthController', () => {
       // CHECK
       expect(authService.register).toHaveBeenCalledTimes(1);
       expect(authService.register).toHaveBeenCalledWith(dto);
+      expect(result).toEqual(safeUser);
+    });
+  });
+
+  describe('login', () => {
+    it('should call authService.login with dto and return safe user', async () => {
+      const dto = {
+        email: 'usertoreg@jest.com',
+        password: 'password',
+      };
+      const safeUser = {
+        userId: 1,
+        email: dto.email,
+      };
+      // MOCK
+      authService.login.mockResolvedValue(safeUser);
+      // CALL
+      const result = await controller.login(dto);
+      // CHECK
+      expect(authService.login).toHaveBeenCalledTimes(1);
+      expect(authService.login).toHaveBeenCalledWith(dto);
       expect(result).toEqual(safeUser);
     });
   });

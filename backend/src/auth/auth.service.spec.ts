@@ -8,6 +8,7 @@ describe('AuthService', () => {
 
   const usersService = {
     create: jest.fn(),
+    findByEmail: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -53,6 +54,42 @@ describe('AuthService', () => {
         userId: createdUser.userId,
         email: createdUser.email,
       });
+    });
+  });
+
+  describe('login', () => {
+    it('should find user, validate password and return safe user', async () => {
+      const email = 'user@user.io';
+      const password = 'plain-password';
+      const userId = 8;
+      const hashedPassword = 'i-m-hashed';
+
+      const dto = {
+        email,
+        password,
+      };
+      const currentUserPayload = {
+        userId,
+        email,
+        passwordHash: hashedPassword,
+      };
+      const safeUser = {
+        userId,
+        email,
+      };
+      // MOCK
+      usersService.findByEmail.mockResolvedValue(currentUserPayload);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
+      // CALL
+      const resp = await service.login(dto);
+      // CHECK
+      expect(usersService.findByEmail).toHaveBeenCalledWith(dto.email);
+
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        dto.password,
+        currentUserPayload.passwordHash,
+      );
+      expect(resp).toEqual(safeUser);
     });
   });
 });
