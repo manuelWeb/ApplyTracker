@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { Response } from 'express';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -49,23 +50,32 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should call authService.login with dto and return safe user', async () => {
+    it('should set access token cookie and return safe user', async () => {
       const dto = {
         email: 'usertoreg@jest.com',
         password: 'password',
       };
-      const safeUser = {
+      const user = {
         userId: 1,
         email: dto.email,
       };
+      const accessToken = 'mock-access-token';
+      const loginResult = {
+        user,
+        accessToken,
+      };
+      const res: Pick<Response, 'cookie'> = { cookie: jest.fn() };
       // MOCK
-      authService.login.mockResolvedValue(safeUser);
+      authService.login.mockResolvedValue(loginResult);
       // CALL
-      const result = await controller.login(dto);
+      const result = await controller.login(dto, res as unknown as Response);
       // CHECK
       expect(authService.login).toHaveBeenCalledTimes(1);
       expect(authService.login).toHaveBeenCalledWith(dto);
-      expect(result).toEqual(safeUser);
+      expect(res.cookie).toHaveBeenCalledWith('access_token', accessToken, {
+        httpOnly: true,
+      });
+      expect(result).toEqual(user);
     });
   });
 });
