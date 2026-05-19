@@ -3,6 +3,9 @@ import { AuthService } from './auth.service';
 import { UsersService } from '@/users/users.service';
 import bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UnauthorizedException } from '@nestjs/common';
+import { EntityNotFoundError } from 'typeorm';
+import { User } from '@/users/entities/user.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -107,6 +110,71 @@ describe('AuthService', () => {
       });
 
       expect(jwtService.signAsync).toHaveBeenCalledWith({ sub: userId, email });
+    });
+
+    it('should throw UnauthorizedException when user is not found', async () => {
+      const dto = {
+        email: 'unknown@user.io',
+        password: 'plain-password',
+      };
+      // MOCK
+      usersService.findByEmail.mockRejectedValue(
+        new EntityNotFoundError(User, { email: dto.email }),
+      );
+      // CALL (do not await otherwise promise will immediately reject before we can assert the rejection)
+      const loginPromise = service.login(dto);
+      // CHECK
+      await expect(loginPromise).rejects.toThrow(UnauthorizedException);
+      expect(usersService.findByEmail).toHaveBeenCalledWith(dto.email);
+      expect(bcrypt.hash).not.toHaveBeenCalled();
+      expect(jwtService.signAsync).not.toHaveBeenCalled();
+    });
+
+    it('should throw UnauthorizedException when password is invalid', async () => {
+      const dto = {
+        email: 'unknown@user.io',
+        password: 'plain-password',
+      };
+      const currentUser = {
+        userId: 8,
+        email: dto.email,
+        passwordHash: 'hashed-password',
+      };
+      // MOCK
+      usersService.findByEmail.mockResolvedValue(currentUser);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
+      // CALL (do not await otherwise the Promise will immediately reject before we can assert the rejection)
+      const loginPromise = service.login(dto);
+      // CHECK
+      await expect(loginPromise).rejects.toThrow(UnauthorizedException);
+
+      expect(usersService.findByEmail).toHaveBeenCalledWith(dto.email);
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        dto.password,
+        currentUser.passwordHash,
+      );
+      expect(jwtService.signAsync).not.toHaveBeenCalled();
+    });
+
+    it('should normalize email (trim,toLowerCase) before looking up user on login', async () => {
+      const dto = {
+        email: '  USER@USER.IO  ',
+        password: 'plain-password',
+      };
+
+      const currentUser = {
+        userId: 8,
+        email: 'user@user.io',
+        passwordHash: 'hashed-password',
+      };
+
+      usersService.findByEmail.mockResolvedValue(currentUser);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
+      jwtService.signAsync.mockResolvedValue('mock-access-token');
+
+      await service.login(dto);
+
+      expect(usersService.findByEmail).toHaveBeenCalledWith('user@user.io');
     });
   });
 });
