@@ -1,15 +1,19 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -30,5 +34,11 @@ export class AuthController {
     res.cookie('access_token', accessToken, { httpOnly: true });
 
     return user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  me(@Req() request: Request) {
+    return request.user;
   }
 }
