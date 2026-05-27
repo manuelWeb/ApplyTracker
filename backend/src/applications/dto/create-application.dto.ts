@@ -1,4 +1,11 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateApplicationDto {
   @IsString()
@@ -23,6 +30,7 @@ export class CreateApplicationDto {
 
   @IsOptional()
   @IsString()
+  @IsUrl()
   jobUrl?: string;
 
   @IsOptional()
@@ -30,11 +38,14 @@ export class CreateApplicationDto {
   score?: number;
 
   @IsInt()
+  @IsPositive()
   companyId!: number;
 
+  @IsPositive()
   @IsInt()
   contractId!: number;
 
+  @IsPositive()
   @IsInt()
   statusId!: number;
 }

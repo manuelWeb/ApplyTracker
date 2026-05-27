@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsPositive,
   IsString,
+  IsUrl,
 } from 'class-validator';
 
 export class UpdateApplicationDto {
@@ -30,6 +31,7 @@ export class UpdateApplicationDto {
 
   @IsOptional()
   @IsString()
+  @IsUrl()
   jobUrl?: string;
 
   @IsOptional()
