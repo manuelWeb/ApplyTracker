@@ -5,6 +5,8 @@ describe('UsersService', () => {
 
   const repo = {
     findOneOrFail: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
   };
 
   beforeEach(() => {
@@ -31,6 +33,32 @@ describe('UsersService', () => {
           email: 'user@jest.com',
         },
       });
+    });
+  });
+
+  describe('create', () => {
+    it('should create and persist (save) a user', async () => {
+      const email = 'user@jest.com';
+      const passwordHash = 'hashed-password';
+
+      const createdUser = {
+        email,
+        passwordHash,
+      };
+
+      const savedUser = {
+        userId: 6,
+        ...createdUser,
+      };
+
+      repo.create.mockReturnValue(createdUser);
+      repo.save.mockResolvedValue(savedUser);
+
+      const resp = await service.create(email, passwordHash);
+
+      expect(repo.create).toHaveBeenCalledWith(createdUser);
+      expect(repo.save).toHaveBeenCalledWith(createdUser);
+      expect(resp).toEqual(savedUser);
     });
   });
 });
