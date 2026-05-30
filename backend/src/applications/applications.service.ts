@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Application } from '@/applications/entities/application.entity';
 import { Repository } from 'typeorm';
@@ -10,8 +10,9 @@ export class ApplicationsService {
     private readonly applicationsRepository: Repository<Application>,
   ) {}
 
-  findAll(): Promise<Application[]> {
+  findAllFromUser(userId: number): Promise<Application[]> {
     return this.applicationsRepository.find({
+      where: { user: { userId } },
       relations: {
         user: true,
         company: true,
@@ -21,9 +22,12 @@ export class ApplicationsService {
     });
   }
 
-  findOne(applicationId: number): Promise<Application> {
-    return this.applicationsRepository.findOneOrFail({
-      where: { applicationId },
+  async findOneFromUser(
+    userId: number,
+    applicationId: number,
+  ): Promise<Application> {
+    const application = await this.applicationsRepository.findOne({
+      where: { user: { userId }, applicationId },
       relations: {
         user: true,
         company: true,
@@ -31,5 +35,11 @@ export class ApplicationsService {
         status: true,
       },
     });
+    if (!application) {
+      throw new NotFoundException(
+        `No application #${applicationId} for userId #${userId}`,
+      );
+    }
+    return application;
   }
 }
