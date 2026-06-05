@@ -9,8 +9,8 @@ dotenv.config({
 const typeOrmDataSource = new DataSource({
   type: 'postgres',
 
-  host: 'localhost',
-  port: Number(process.env.POSTGRES_HOST_PORT),
+  host: process.env.POSTGRES_CLI_HOST ?? 'localhost',
+  port: Number(process.env.POSTGRES_HOST_PORT ?? 5432),
 
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
