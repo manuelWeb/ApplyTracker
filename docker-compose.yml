@@ -21,6 +21,11 @@ services:
     env_file:
       - .env
       - ./backend/.env
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "1000"
+      TSC_WATCHFILE: "UsePolling"
+      TSC_WATCHDIRECTORY: "RecursiveDirectoryUsingPolling"
     ports:
       # - "${PORT}:3000"
       - 3008:3000

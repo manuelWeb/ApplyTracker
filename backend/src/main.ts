@@ -5,7 +5,12 @@ import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const isProduction = process.env.NODE_ENV === 'production';
+  const app = await NestFactory.create(AppModule, {
+    logger: isProduction
+      ? ['error', 'warn', 'log']
+      : ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
