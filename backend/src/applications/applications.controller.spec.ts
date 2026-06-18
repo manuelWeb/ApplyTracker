@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ApplicationsController } from './applications.controller';
 import { ApplicationsService } from './applications.service';
 import { NotFoundException } from '@nestjs/common';
+import { ApplicationResponseDto } from './dto/application.response.dto';
+import { Application } from './entities/application.entity';
+import { CreateApplicationDto } from './dto/create-application.dto';
 
 describe('ApplicationsController', () => {
   let controller: ApplicationsController;
@@ -9,6 +12,7 @@ describe('ApplicationsController', () => {
   const service = {
     findAllFromUser: jest.fn(),
     findOneFromUser: jest.fn(),
+    create: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -71,6 +75,81 @@ describe('ApplicationsController', () => {
         userId,
         applicationId,
       );
+    });
+  });
+
+  describe('create', () => {
+    it('should create and return application', async () => {
+      // Arrange
+      const userId = 42;
+      const dto: CreateApplicationDto = {
+        jobTitle: 'Application expected jobTitle from CreateApplicationDto',
+        companyId: 10,
+        contractId: 20,
+        statusId: 30,
+      };
+      const application: Application = {
+        applicationId: 5432,
+        jobTitle: dto.jobTitle,
+        jobDescription: undefined,
+        jobUrl: undefined,
+        jobDomain: undefined,
+        projectGoal: undefined,
+        location: undefined,
+        score: 0,
+        user: {
+          userId,
+          email: 'user@test.com',
+          passwordHash: 'should-not-leak',
+        },
+        company: {
+          companyId: dto.companyId,
+          name: 'ACME',
+          website: undefined,
+        },
+        contract: {
+          contractId: dto.contractId,
+          name: 'CDI',
+        },
+        status: {
+          statusId: dto.statusId,
+          displayOrder: 1,
+          name: 'draft',
+        },
+        tags: [],
+        documents: [],
+      };
+      const expectedResponse: ApplicationResponseDto = {
+        applicationId: application.applicationId,
+        jobTitle: application.jobTitle,
+        jobDescription: null,
+        jobDomain: null,
+        jobUrl: null,
+        projectGoal: null,
+        location: null,
+        score: application.score,
+        contract: {
+          contractId: application.contract.contractId,
+          name: application.contract.name,
+        },
+        company: {
+          companyId: application.company.companyId,
+          name: application.company.name,
+          website: null,
+        },
+        status: {
+          statusId: application.status.statusId,
+          displayOrder: application.status.displayOrder,
+          name: application.status.name,
+        },
+      };
+      service.create.mockResolvedValue(application);
+      // Act
+      const response = await controller.create(dto, userId);
+      // Assert
+      expect(service.create).toHaveBeenCalledWith(dto, userId);
+      expect(response).toEqual(expectedResponse);
+      expect(response).not.toHaveProperty('user');
     });
   });
 });
