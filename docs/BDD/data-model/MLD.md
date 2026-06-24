@@ -8,7 +8,7 @@
 - CONTRAT ( num_contrat, nom )
 - DOCUMENT ( num_document, nom, type_document, file_path, #num_utilisateur )
 - EMAIL_TEMPLATE ( num_email_template, nom, sujet, corps, #num_utilisateur )
-- ENTREPRISE ( num_entreprise, nom, site_web )
+- ENTREPRISE ( num_entreprise, nom, nom_normalise, site_web, est_verifiee, #num_utilisateur_createur nullable )
 - EVENEMENT ( num_evenement, type_evenement, date_evenement, #num_candidature )
 - QUALIFIE_CANDIDATURE ( #num_candidature, #num_tag )
 - QUALIFIE_DOCUMENT ( #num_document, #num_tag )
