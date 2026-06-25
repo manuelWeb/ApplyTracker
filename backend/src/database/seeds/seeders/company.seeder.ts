@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { Company } from '@/companies/entities/company.entity';
 import { Seeder } from '@/database/seeds/seeders/seeder.interface';
+import { normalizeCompanyName } from '@/companies/utils/normalize-company-name';
 
 export const seedCompanies = [
   { name: 'Example Company', website: 'https://www.example.com' },
@@ -11,8 +12,9 @@ export class CompanySeeder implements Seeder {
 
   async run(): Promise<void> {
     for (const { name, website } of seedCompanies) {
+      const normalizedName = normalizeCompanyName(name);
       const existingCompany = await this.companyRepository.findOne({
-        where: { name },
+        where: { normalizedName },
       });
 
       if (existingCompany) {
@@ -23,6 +25,7 @@ export class CompanySeeder implements Seeder {
       const company = this.companyRepository.create({
         name,
         website,
+        normalizedName,
       });
 
       await this.companyRepository.save(company);
