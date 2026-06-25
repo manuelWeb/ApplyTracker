@@ -28,7 +28,10 @@ Table applications {
 Table companies {
   company_id int [pk, increment]
   name varchar(255) [not null]
+  normalized_name varchar(255) [not null, unique]
   website varchar(255)
+  is_verified boolean [not null, default: false]
+  created_by_user_id int [ref: > users.user_id]
 }
 
 Table contacts {
