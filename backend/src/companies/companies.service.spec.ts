@@ -1,10 +1,17 @@
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { NotFoundException } from '@nestjs/common';
-import { UpdateResult, DeleteResult, DeepPartial } from 'typeorm';
+import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  UpdateResult,
+  DeleteResult,
+  DeepPartial,
+  QueryFailedError,
+} from 'typeorm';
 import { normalizeCompanyName } from './utils/normalize-company-name';
 import { Company } from './entities/company.entity';
+import { POSTGRES_ERROR_CODES } from '@/database/postgres-error-codes';
+import { PostgresQueryFailedError } from '@/database/types/postgres-error.type';
 
 describe('CompaniesService', () => {
   let service: CompaniesService;
@@ -72,7 +79,73 @@ describe('CompaniesService', () => {
       expect(repo.save).toHaveBeenCalledWith(createdCompany);
       expect(result).toEqual(savedCompany);
     });
+    it('should throw ConflictException when company exists', async () => {
+      // Arrange
+      const dto: CreateCompanyDto = {
+        name: "Company name I'm throwing a conflict",
+      };
+      const currentUserId = 5432;
+      const createdCompany: DeepPartial<Company> = {
+        name: dto.name,
+        normalizedName: normalizeCompanyName(dto.name),
+        website: dto.website,
+        createdByUser: { userId: currentUserId },
+      };
+      const error = new QueryFailedError(
+        '',
+        [],
+        new Error(`Company "${dto.name}" already exists`),
+      ) as PostgresQueryFailedError;
+      error.code = POSTGRES_ERROR_CODES.UNIQUE_VIOLATION;
+      repo.create.mockReturnValue(createdCompany);
+      repo.save.mockRejectedValue(error);
+      // Act
+      const action = service.create(dto, currentUserId);
+      // Assert
+      await expect(action).rejects.toThrow(ConflictException);
+      expect(repo.create).toHaveBeenCalledTimes(1);
+      expect(repo.create).toHaveBeenCalledWith({
+        name: dto.name,
+        normalizedName: normalizeCompanyName(dto.name),
+        website: dto.website,
+        createdByUser: { userId: currentUserId },
+      });
+      expect(repo.save).toHaveBeenCalledTimes(1);
+      expect(repo.save).toHaveBeenCalledWith(createdCompany);
+    });
+    it('should rethrow unexpected errors', async () => {
+      // Arrange
+      const dto: CreateCompanyDto = {
+        name: "Company name I'm throwing a conflict",
+      };
+      const currentUserId = 5432;
+      const createdCompany: DeepPartial<Company> = {
+        name: dto.name,
+        normalizedName: normalizeCompanyName(dto.name),
+        website: dto.website,
+        createdByUser: { userId: currentUserId },
+      };
+      const unexpectedError = new Error(
+        'Generic error outside of ConflictException',
+      );
+      repo.create.mockReturnValue(createdCompany);
+      repo.save.mockRejectedValue(unexpectedError);
+      // Act
+      const action = service.create(dto, currentUserId);
+      // Assert
+      await expect(action).rejects.toBe(unexpectedError);
+      expect(repo.create).toHaveBeenCalledTimes(1);
+      expect(repo.create).toHaveBeenCalledWith({
+        name: dto.name,
+        normalizedName: normalizeCompanyName(dto.name),
+        website: dto.website,
+        createdByUser: { userId: currentUserId },
+      });
+      expect(repo.save).toHaveBeenCalledTimes(1);
+      expect(repo.save).toHaveBeenCalledWith(createdCompany);
+    });
   });
+
   describe('update', () => {
     it('should update a company', async () => {
       // Arrange

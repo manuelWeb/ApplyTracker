@@ -1,10 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from '@/companies/entities/company.entity';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { normalizeCompanyName } from './utils/normalize-company-name';
+import { PostgresQueryFailedError } from '@/database/types/postgres-error.type';
+import { POSTGRES_ERROR_CODES } from '@/database/postgres-error-codes';
 
 @Injectable()
 export class CompaniesService {
@@ -23,14 +29,23 @@ export class CompaniesService {
     });
   }
 
-  create(dto: CreateCompanyDto, currentUserId: number): Promise<Company> {
+  async create(dto: CreateCompanyDto, currentUserId: number): Promise<Company> {
     const newCompany = this.companiesRepository.create({
       name: dto.name,
       normalizedName: normalizeCompanyName(dto.name),
       website: dto.website,
       createdByUser: { userId: currentUserId },
     });
-    return this.companiesRepository.save(newCompany);
+
+    try {
+      return await this.companiesRepository.save(newCompany);
+    } catch (err) {
+      const postgresError = err as PostgresQueryFailedError;
+      if (postgresError.code === POSTGRES_ERROR_CODES.UNIQUE_VIOLATION) {
+        throw new ConflictException(`Company "${dto.name}" already exists`);
+      }
+      throw err;
+    }
   }
 
   async update({
