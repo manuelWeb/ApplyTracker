@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CompaniesController } from './companies.controller';
 import { CompaniesService } from './companies.service';
+import { CreateCompanyDto } from './dto/create-company.dto';
+import { Company } from './entities/company.entity';
+import { normalizeCompanyName } from './utils/normalize-company-name';
 
 describe('CompaniesController', () => {
   let controller: CompaniesController;
@@ -8,6 +11,7 @@ describe('CompaniesController', () => {
   const service = {
     findAll: jest.fn(),
     findOne: jest.fn(),
+    create: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -50,6 +54,44 @@ describe('CompaniesController', () => {
       expect(resp).toEqual(result);
       expect(service.findOne).toHaveBeenCalledTimes(1);
       expect(service.findOne).toHaveBeenCalledWith(id);
+    });
+  });
+
+  describe('create', () => {
+    it('should create a company from service', async () => {
+      // Arrange
+      const dto: CreateCompanyDto = {
+        name: 'Jest Company',
+        website: 'https://jest.com',
+      };
+      const currentUserId = 5432;
+      const createdCompany: Company = {
+        companyId: 1,
+        name: dto.name,
+        normalizedName: normalizeCompanyName(dto.name),
+        website: dto.website,
+        createdByUser: {
+          userId: currentUserId,
+          email: 'test@test.fr',
+          passwordHash: 'password',
+        },
+        isVerified: false,
+      };
+      service.create.mockResolvedValue(createdCompany);
+      // Act
+      const resp = await controller.create(dto, currentUserId);
+      // Assert
+      expect(service.create).toHaveBeenCalledTimes(1);
+      expect(service.create).toHaveBeenCalledWith(dto, currentUserId);
+      expect(resp).toEqual({
+        companyId: 1,
+        name: dto.name,
+        normalizedName: normalizeCompanyName(dto.name),
+        website: dto.website,
+        isVerified: false,
+      });
+      expect(resp).not.toHaveProperty('createdByUser');
+      expect(JSON.stringify(resp)).not.toContain('passwordHash');
     });
   });
 });
