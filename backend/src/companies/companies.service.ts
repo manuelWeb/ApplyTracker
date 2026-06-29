@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from '@/companies/entities/company.entity';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { normalizeCompanyName } from './utils/normalize-company-name';
@@ -18,6 +18,17 @@ export class CompaniesService {
     @InjectRepository(Company)
     private readonly companiesRepository: Repository<Company>,
   ) {}
+
+  searchByName(search: string): Promise<Company[]> {
+    const normalizedSearch = normalizeCompanyName(search);
+    return this.companiesRepository.find({
+      where: {
+        normalizedName: Like(`%${normalizedSearch}%`),
+      },
+      take: 10,
+      order: { name: 'ASC' },
+    });
+  }
 
   findAll(): Promise<Company[]> {
     return this.companiesRepository.find();

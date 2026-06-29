@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
@@ -14,16 +15,29 @@ import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { toCompanyResponseDto } from './mappers/company-response.mapper';
 import { CompanyResponseDto } from './dto/response-company.dto';
 import {
+  ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { SearchCompaniesQueryDto } from './dto/search-company-query.dto';
 
 @ApiTags('companies')
 @Controller('companies')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
+
+  @ApiOkResponse({ type: CompanyResponseDto, isArray: true })
+  @ApiBadRequestResponse({ description: 'Invalid search query' })
+  @Get('autocomplete')
+  async autocomplete(
+    @Query() query: SearchCompaniesQueryDto,
+  ): Promise<CompanyResponseDto[]> {
+    const companies = await this.companiesService.searchByName(query.search);
+    return companies.map((c) => toCompanyResponseDto(c));
+  }
 
   @Get()
   findAll() {

@@ -7,6 +7,7 @@ import {
   DeleteResult,
   DeepPartial,
   QueryFailedError,
+  Like,
 } from 'typeorm';
 import { normalizeCompanyName } from './utils/normalize-company-name';
 import { Company } from './entities/company.entity';
@@ -28,6 +29,35 @@ describe('CompaniesService', () => {
     jest.clearAllMocks();
 
     service = new CompaniesService(repo as any);
+  });
+
+  describe('searchByName', () => {
+    it('should search companies by normalized name', async () => {
+      // Arrange
+      const search = ' OPEN    AI   ';
+      const companies: DeepPartial<Company>[] = [
+        {
+          companyId: 1,
+          name: 'Open AI',
+          normalizedName: 'open ai',
+          website: 'https://openai.com',
+          isVerified: false,
+        },
+      ];
+      repo.find.mockResolvedValue(companies);
+      // Act
+      const action = service.searchByName(search);
+      // Assert
+      await expect(action).resolves.toEqual(companies);
+      expect(repo.find).toHaveBeenCalledTimes(1);
+      expect(repo.find).toHaveBeenCalledWith({
+        where: {
+          normalizedName: Like('%open ai%'),
+        },
+        take: 10,
+        order: { name: 'ASC' },
+      });
+    });
   });
 
   describe('findAll', () => {
