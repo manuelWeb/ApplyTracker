@@ -7,6 +7,7 @@ import { User } from '@/users/entities/user.entity';
 import { Company } from '@/companies/entities/company.entity';
 import { Contract } from '@/contracts/entities/contract.entity';
 import { Status } from '@/statuses/entities/status.entity';
+import { UpdateApplicationDto } from './dto/update-application.dto';
 
 type DeleteApplicationParams = {
   userId: number;
@@ -105,6 +106,49 @@ export class ApplicationsService {
     });
 
     return await this.applicationsRepository.save(newApplication);
+  }
+
+  async patch({
+    userId,
+    applicationId,
+    dto,
+  }: {
+    userId: number;
+    applicationId: number;
+    dto: UpdateApplicationDto;
+  }): Promise<void> {
+    const patchedApplication = {
+      criteria: { applicationId, user: { userId } },
+      partialEntity: {
+        ...(dto.jobTitle !== undefined && { jobTitle: dto.jobTitle }),
+        ...(dto.jobDomain !== undefined && { jobDomain: dto.jobDomain }),
+        ...(dto.location !== undefined && { location: dto.location }),
+        ...(dto.projectGoal !== undefined && { projectGoal: dto.projectGoal }),
+        ...(dto.jobDescription !== undefined && {
+          jobDescription: dto.jobDescription,
+        }),
+        ...(dto.jobUrl !== undefined && { jobUrl: dto.jobUrl }),
+        ...(dto.score !== undefined && { score: dto.score }),
+        ...(dto.companyId !== undefined && {
+          company: { companyId: dto.companyId },
+        }),
+        ...(dto.contractId !== undefined && {
+          contract: { contractId: dto.contractId },
+        }),
+        ...(dto.statusId !== undefined && {
+          status: { statusId: dto.statusId },
+        }),
+      },
+    };
+    const result = await this.applicationsRepository.update(
+      patchedApplication.criteria,
+      patchedApplication.partialEntity,
+    );
+    if (result.affected === 0) {
+      throw new NotFoundException(
+        `No application #${applicationId} for userId #${userId}`,
+      );
+    }
   }
 
   async delete({

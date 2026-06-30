@@ -1,16 +1,17 @@
 import { ApplicationsService } from '@/applications/applications.service';
 import { NotFoundException } from '@nestjs/common';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeepPartial, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Application } from './entities/application.entity';
 import { User } from '@/users/entities/user.entity';
 import { Company } from '@/companies/entities/company.entity';
 import { Contract } from '@/contracts/entities/contract.entity';
 import { Status } from '@/statuses/entities/status.entity';
 import { CreateApplicationDto } from './dto/create-application.dto';
+import { UpdateApplicationDto } from './dto/update-application.dto';
 
 type ApplicationRepositoryMock = Pick<
   Repository<Application>,
-  'find' | 'findOne' | 'create' | 'save' | 'delete'
+  'find' | 'findOne' | 'create' | 'save' | 'delete' | 'update'
 >;
 type RelationRepositoryMock<T extends object> = Pick<Repository<T>, 'findOne'>;
 
@@ -22,6 +23,7 @@ describe('ApplicationsService', () => {
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
+    update: jest.fn(),
     delete: jest.fn(),
   };
   const usersRepository: jest.Mocked<RelationRepositoryMock<User>> = {
@@ -378,6 +380,101 @@ describe('ApplicationsService', () => {
       });
       expect(applicationsRepository.create).not.toHaveBeenCalled();
       expect(applicationsRepository.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('patch', () => {
+    it('should patch owned application', async () => {
+      // Arrange
+      const userId = 5432;
+      const applicationId = 2345;
+      const dto: UpdateApplicationDto = {
+        jobTitle: 'New patched jobTitle',
+      };
+      const partialEntity: DeepPartial<Application> = {
+        ...(dto.jobTitle !== undefined && { jobTitle: dto.jobTitle }),
+        ...(dto.jobDomain !== undefined && { jobDomain: dto.jobDomain }),
+        ...(dto.location !== undefined && { location: dto.location }),
+        ...(dto.projectGoal !== undefined && { projectGoal: dto.projectGoal }),
+        ...(dto.jobDescription !== undefined && {
+          jobDescription: dto.jobDescription,
+        }),
+        ...(dto.jobUrl !== undefined && { jobUrl: dto.jobUrl }),
+        ...(dto.score !== undefined && { score: dto.score }),
+        ...(dto.companyId !== undefined && {
+          company: { companyId: dto.companyId },
+        }),
+        ...(dto.contractId !== undefined && {
+          contract: { contractId: dto.contractId },
+        }),
+        ...(dto.statusId !== undefined && {
+          status: { statusId: dto.statusId },
+        }),
+      };
+      const updateResult: UpdateResult = {
+        raw: [],
+        affected: 1,
+        generatedMaps: [],
+      };
+      applicationsRepository.update.mockResolvedValue(updateResult);
+      // Act
+      const result = await service.patch({ userId, applicationId, dto });
+      // Assert
+      expect(applicationsRepository.update).toHaveBeenCalledTimes(1);
+      expect(applicationsRepository.update).toHaveBeenCalledWith(
+        {
+          applicationId,
+          user: { userId },
+        },
+        partialEntity,
+      );
+      expect(result).toBeUndefined();
+    });
+    it('should throw NotFoundException when application is not found for user', async () => {
+      // Arrange
+      const userId = 5432;
+      const applicationId = 2345;
+      const dto: UpdateApplicationDto = {
+        jobTitle: 'New patched jobTitle',
+      };
+      const partialEntity: DeepPartial<Application> = {
+        ...(dto.jobTitle !== undefined && { jobTitle: dto.jobTitle }),
+        ...(dto.jobDomain !== undefined && { jobDomain: dto.jobDomain }),
+        ...(dto.location !== undefined && { location: dto.location }),
+        ...(dto.projectGoal !== undefined && { projectGoal: dto.projectGoal }),
+        ...(dto.jobDescription !== undefined && {
+          jobDescription: dto.jobDescription,
+        }),
+        ...(dto.jobUrl !== undefined && { jobUrl: dto.jobUrl }),
+        ...(dto.score !== undefined && { score: dto.score }),
+        ...(dto.companyId !== undefined && {
+          company: { companyId: dto.companyId },
+        }),
+        ...(dto.contractId !== undefined && {
+          contract: { contractId: dto.contractId },
+        }),
+        ...(dto.statusId !== undefined && {
+          status: { statusId: dto.statusId },
+        }),
+      };
+      const updateResult: UpdateResult = {
+        raw: [],
+        affected: 0,
+        generatedMaps: [],
+      };
+      applicationsRepository.update.mockResolvedValue(updateResult);
+      // Act
+      const action = service.patch({ userId, applicationId, dto });
+      // Assert
+      await expect(action).rejects.toThrow(NotFoundException);
+      expect(applicationsRepository.update).toHaveBeenCalledTimes(1);
+      expect(applicationsRepository.update).toHaveBeenCalledWith(
+        {
+          user: { userId },
+          applicationId,
+        },
+        partialEntity,
+      );
     });
   });
 
