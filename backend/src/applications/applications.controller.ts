@@ -6,6 +6,7 @@ import {
   HttpCode,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -22,6 +23,7 @@ import {
   ApiUnauthorizedResponse,
   ApiNoContentResponse,
 } from '@nestjs/swagger';
+import { UpdateApplicationDto } from './dto/update-application.dto';
 
 @Controller('applications')
 export class ApplicationsController {
@@ -56,6 +58,25 @@ export class ApplicationsController {
   ): Promise<ApplicationResponseDto> {
     const application = await this.applicationsService.create(dto, userId);
     return toApplicationResponseDto(application);
+  }
+
+  @ApiNoContentResponse({ description: 'Application updated successfully' })
+  @ApiBadRequestResponse({
+    description: 'Invalid application payload or id parameter',
+  })
+  @ApiUnauthorizedResponse({ description: 'Authentication required' })
+  @ApiNotFoundResponse({
+    description: 'Application not found for authenticated user',
+  })
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async update(
+    @CurrentUserId() userId: number,
+    @Param('id', ParseIntPipe) applicationId: number,
+    @Body() dto: UpdateApplicationDto,
+  ): Promise<void> {
+    await this.applicationsService.patch({ userId, applicationId, dto });
   }
 
   @ApiNoContentResponse({ description: 'Application deleted successfully' })

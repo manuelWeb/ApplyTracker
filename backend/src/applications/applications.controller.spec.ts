@@ -5,6 +5,7 @@ import { NotFoundException } from '@nestjs/common';
 import { ApplicationResponseDto } from './dto/application.response.dto';
 import { Application } from './entities/application.entity';
 import { CreateApplicationDto } from './dto/create-application.dto';
+import { UpdateApplicationDto } from './dto/update-application.dto';
 
 describe('ApplicationsController', () => {
   let controller: ApplicationsController;
@@ -13,6 +14,7 @@ describe('ApplicationsController', () => {
     findAllFromUser: jest.fn(),
     findOneFromUser: jest.fn(),
     create: jest.fn(),
+    patch: jest.fn(),
     delete: jest.fn(),
   };
 
@@ -106,7 +108,9 @@ describe('ApplicationsController', () => {
         company: {
           companyId: dto.companyId,
           name: 'ACME',
+          normalizedName: 'acme',
           website: undefined,
+          isVerified: false,
         },
         contract: {
           contractId: dto.contractId,
@@ -151,6 +155,48 @@ describe('ApplicationsController', () => {
       expect(service.create).toHaveBeenCalledWith(dto, userId);
       expect(response).toEqual(expectedResponse);
       expect(response).not.toHaveProperty('user');
+    });
+  });
+
+  describe('patch', () => {
+    it('should update an application', async () => {
+      // Arrange
+      const applicationId = 5432;
+      const currentUserId = 8;
+      const dto: UpdateApplicationDto = {
+        score: 8,
+      };
+      service.patch.mockResolvedValue(undefined);
+      // Act
+      const action = await controller.update(currentUserId, applicationId, dto);
+      // Assert
+      expect(action).toBeUndefined();
+      expect(service.patch).toHaveBeenCalledTimes(1);
+      expect(service.patch).toHaveBeenCalledWith({
+        userId: currentUserId,
+        applicationId,
+        dto,
+      });
+    });
+    it('should throw a NotFoundException when application is not found for user', async () => {
+      // Arrange
+      const currentUserId = 8;
+      const applicationId = 3;
+      const dto: UpdateApplicationDto = {
+        score: 8,
+      };
+      const error = new NotFoundException();
+      service.patch.mockRejectedValue(error);
+      // Act
+      const action = controller.update(currentUserId, applicationId, dto);
+      // Assert
+      await expect(action).rejects.toThrow(NotFoundException);
+      expect(service.patch).toHaveBeenCalledTimes(1);
+      expect(service.patch).toHaveBeenCalledWith({
+        applicationId,
+        userId: currentUserId,
+        dto,
+      });
     });
   });
 
