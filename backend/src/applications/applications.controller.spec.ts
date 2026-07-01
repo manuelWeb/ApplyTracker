@@ -13,6 +13,7 @@ describe('ApplicationsController', () => {
     findAllFromUser: jest.fn(),
     findOneFromUser: jest.fn(),
     create: jest.fn(),
+    delete: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -150,6 +151,40 @@ describe('ApplicationsController', () => {
       expect(service.create).toHaveBeenCalledWith(dto, userId);
       expect(response).toEqual(expectedResponse);
       expect(response).not.toHaveProperty('user');
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete an application', async () => {
+      // Arrange
+      const currentUserId = 43;
+      const applicationId = 23;
+      service.delete.mockResolvedValue(undefined);
+      // Act
+      const action = await controller.delete(applicationId, currentUserId);
+      // Assert
+      expect(action).toBeUndefined();
+      expect(service.delete).toHaveBeenCalledTimes(1);
+      expect(service.delete).toHaveBeenCalledWith({
+        applicationId,
+        userId: currentUserId,
+      });
+    });
+    it('should throw a NotFoundException', async () => {
+      // Arrange
+      const currentUserId = 8;
+      const applicationId = 3;
+      const error = new NotFoundException();
+      service.delete.mockRejectedValue(error);
+      // Act
+      const action = controller.delete(applicationId, currentUserId);
+      // Assert
+      await expect(action).rejects.toThrow(NotFoundException);
+      expect(service.delete).toHaveBeenCalledTimes(1);
+      expect(service.delete).toHaveBeenCalledWith({
+        applicationId,
+        userId: currentUserId,
+      });
     });
   });
 });

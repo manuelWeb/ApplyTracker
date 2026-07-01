@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
   Post,
@@ -18,6 +20,7 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
+  ApiNoContentResponse,
 } from '@nestjs/swagger';
 
 @Controller('applications')
@@ -53,5 +56,21 @@ export class ApplicationsController {
   ): Promise<ApplicationResponseDto> {
     const application = await this.applicationsService.create(dto, userId);
     return toApplicationResponseDto(application);
+  }
+
+  @ApiNoContentResponse({ description: 'Application deleted successfully' })
+  @ApiBadRequestResponse({ description: 'Invalid application id parameter' })
+  @ApiUnauthorizedResponse({ description: 'Authentication required' })
+  @ApiNotFoundResponse({
+    description: 'Application not found for authenticated user',
+  })
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async delete(
+    @Param('id', ParseIntPipe) applicationId: number,
+    @CurrentUserId() userId: number,
+  ): Promise<void> {
+    await this.applicationsService.delete({ userId, applicationId });
   }
 }
