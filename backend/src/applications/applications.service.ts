@@ -8,6 +8,11 @@ import { Company } from '@/companies/entities/company.entity';
 import { Contract } from '@/contracts/entities/contract.entity';
 import { Status } from '@/statuses/entities/status.entity';
 
+type DeleteApplicationParams = {
+  userId: number;
+  applicationId: number;
+};
+
 @Injectable()
 export class ApplicationsService {
   constructor(
@@ -100,5 +105,21 @@ export class ApplicationsService {
     });
 
     return await this.applicationsRepository.save(newApplication);
+  }
+
+  async delete({
+    userId,
+    applicationId,
+  }: DeleteApplicationParams): Promise<void> {
+    const result = await this.applicationsRepository.delete({
+      applicationId,
+      user: { userId },
+    });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(
+        `No application #${applicationId} for userId #${userId}`,
+      );
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { ApplicationsService } from '@/applications/applications.service';
 import { NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { Application } from './entities/application.entity';
 import { User } from '@/users/entities/user.entity';
 import { Company } from '@/companies/entities/company.entity';
@@ -10,7 +10,7 @@ import { CreateApplicationDto } from './dto/create-application.dto';
 
 type ApplicationRepositoryMock = Pick<
   Repository<Application>,
-  'find' | 'findOne' | 'create' | 'save'
+  'find' | 'findOne' | 'create' | 'save' | 'delete'
 >;
 type RelationRepositoryMock<T extends object> = Pick<Repository<T>, 'findOne'>;
 
@@ -22,6 +22,7 @@ describe('ApplicationsService', () => {
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
+    delete: jest.fn(),
   };
   const usersRepository: jest.Mocked<RelationRepositoryMock<User>> = {
     findOne: jest.fn(),
@@ -377,6 +378,49 @@ describe('ApplicationsService', () => {
       });
       expect(applicationsRepository.create).not.toHaveBeenCalled();
       expect(applicationsRepository.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete an application', async () => {
+      // Arrange
+      const applicationId = 5432;
+      const currentUserId = 72;
+      applicationsRepository.delete.mockResolvedValue({ affected: 1, raw: [] });
+      // Act
+      const result = await service.delete({
+        userId: currentUserId,
+        applicationId,
+      });
+      // Assert
+      expect(applicationsRepository.delete).toHaveBeenCalledTimes(1);
+      expect(applicationsRepository.delete).toHaveBeenCalledWith({
+        user: { userId: currentUserId },
+        applicationId,
+      });
+      expect(result).toBeUndefined();
+    });
+    it('should throw NotFoundException when application is not found for user', async () => {
+      // Arrange
+      const currentUserId = 98;
+      const applicationId = 5432;
+      const deleteResult: DeleteResult = {
+        raw: [],
+        affected: 0,
+      };
+      applicationsRepository.delete.mockResolvedValue(deleteResult);
+      // Act
+      const action: Promise<void> = service.delete({
+        userId: currentUserId,
+        applicationId,
+      });
+      // Assert
+      await expect(action).rejects.toThrow(NotFoundException);
+      expect(applicationsRepository.delete).toHaveBeenCalledTimes(1);
+      expect(applicationsRepository.delete).toHaveBeenCalledWith({
+        user: { userId: currentUserId },
+        applicationId,
+      });
     });
   });
 });
